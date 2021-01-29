@@ -31,11 +31,16 @@
     fetch("overpass-export.geojson")
         .then(response => response.json())
         .then(json => json.features.forEach(church => {
-            let pos = church.geometry.coordinates
-            while(Array.isArray(pos[0])) {
-                pos = pos[0]
+            function avg(ar) {
+                if(Array.isArray(ar[0]))
+                    return ar.reduce((acc, elem) => {
+                        const averaged = avg(elem)
+                        return [acc[0] + averaged[0], acc[1] + averaged[1]]
+                    }, [0, 0]).map(value => value / ar.length)
+                else
+                    return ar
             }
-            const marker = L.marker(pos.reverse()).addTo(map)
+            const marker = L.marker(avg(church.geometry.coordinates).reverse()).addTo(map)
             marker.bindPopup(church.properties.name)
         }));
 </script>
