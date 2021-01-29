@@ -40,8 +40,12 @@
                 else
                     return ar
             }
-            const marker = L.marker(avg(church.geometry.coordinates).reverse()).addTo(map)
-            marker.bindPopup(church.properties.name)
+            const marker = L.marker(avg(church.geometry.coordinates).reverse(), {
+                title: church.properties.name,
+                riseOnHover: true
+            }).addTo(map)
+            if(church.properties.name)
+                marker.bindPopup(church.properties.name)
         }));
 </script>
 </html>
