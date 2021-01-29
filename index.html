@@ -48,8 +48,13 @@
             title: church.properties.name,
             riseOnHover: true
         }).addTo(map).on('click', () => console.log(church))
-        if (church.properties.name)
-            marker.bindPopup(church.properties.name)
+        const props = church.properties
+        const content = (props.name ? "<b>" + props.name + "</b>" : "") + (props.denomination ? "<br>" + props.denomination : "")
+        if(content) {
+            marker.bindPopup(content, {
+                maxWidth: 500
+            })
+        }
     }
     fetch("overpass-export.geojson")
         .then(response => response.json())
