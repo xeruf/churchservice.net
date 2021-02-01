@@ -29,3 +29,6 @@ out body;
 >;
 out skel qt;
 ```
+
+## Q&A
+- Filter markers in Leaflet: https://stackoverflow.com/questions/59043661/leaflet-filter-markers

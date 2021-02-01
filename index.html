@@ -52,8 +52,17 @@
             riseOnHover: true
         }).on('click', () => console.log(church))
         const props = church.properties
-        const content = (props.name ? "<b>" + props.name + "</b>" : "") + (props.denomination ? "<br>" + props.denomination : "")
-        if(content) {
+        function joinFiltered(delim, ...values) {
+            return values.filter(it => it !== undefined && it.length > 0).join(delim)
+        }
+        const content =
+            joinFiltered("<br>", props.name && "<b>" + props.name + "</b>",
+                props.denomination && "<i>" + props.denomination + "</i>",
+                props.service_times && "Gottesdienst: " + props.service_times,
+                joinFiltered(" ", props["addr:street"], props["addr:housenumber"]),
+                joinFiltered(" ", props["addr:postcode"], props["addr:suburb"] || props["addr:city"]),
+            )
+        if(content.length > 0) {
             marker.bindPopup(content, {
                 maxWidth: 500
             })
@@ -63,6 +72,7 @@
     fetch("overpass-export.geojson")
         .then(response => response.json())
         .then(json => json.features
+            .filter(church => church.properties.name)
             .map(createMarker)
             .forEach(churches.addLayer.bind(churches)))
 </script>
