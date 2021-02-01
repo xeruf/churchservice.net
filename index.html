@@ -19,6 +19,8 @@
 </head>
 <body>
 <div id="map"></div>
+<input type="text" id="filterbox" oninput="filter(this.value)" placeholder="Finde deinen Gottesdienst..."
+style="position: absolute; top: 10px; left: 50px; z-index: 999"/>
 </body>
 <script>
     const map = L.map('map', {
@@ -52,6 +54,7 @@
             riseOnHover: true
         }).on('click', () => console.log(church))
         const props = church.properties
+        marker.properties = props
         function joinFiltered(delim, ...values) {
             return values.filter(it => it !== undefined && it.length > 0).join(delim)
         }
@@ -69,11 +72,23 @@
         }
         return marker
     }
-    fetch("overpass-export.geojson")
+
+    const markers = fetch("overpass-export.geojson")
         .then(response => response.json())
         .then(json => json.features
             .filter(church => church.properties.name)
-            .map(createMarker)
-            .forEach(churches.addLayer.bind(churches)))
+            .map(createMarker))
+    filter(document.getElementById("filterbox").value)
+
+    function filter(string) {
+        markers.then(markers => {
+            churches.clearLayers()
+            markers
+                .filter(church => !string ||
+                    church.properties.name.toLowerCase().includes(string.toLowerCase()))
+                .forEach(churches.addLayer.bind(churches))
+        })
+    }
+
 </script>
 </html>
