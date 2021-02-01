@@ -15,7 +15,7 @@
             margin: 0;
         }
         #map { height: 100%; }
-   </style>
+    </style>
 </head>
 <body>
 <div id="map"></div>
@@ -25,30 +25,32 @@
         center: [52.5, 13.4],
         zoom: 13,
         minZoom: 11,
-    });
+    })
     L.tileLayer('https://{s}.tile.openstreetmap.de/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
-    function placeMarker(church) {
+    }).addTo(map)
+
+    const churches = L.featureGroup().addTo(map)
+    function createMarker(church) {
         function pos(ar) {
             let data = ar
             while(Array.isArray(data[0])) {
-               if(data.length > 2)  {
-                   return data.reduce((acc, elem) => {
-                       let corner = elem
-                       while (Array.isArray(corner[0]))
-                           corner = corner[0]
-                       return [acc[0] + corner[0], acc[1] + corner[1]]
-                   }, [0, 0]).map(value => value / data.length)
-               }
-               data = data[0]
+                if(data.length > 2)  {
+                    return data.reduce((acc, elem) => {
+                        let corner = elem
+                        while (Array.isArray(corner[0]))
+                            corner = corner[0]
+                        return [acc[0] + corner[0], acc[1] + corner[1]]
+                    }, [0, 0]).map(value => value / data.length)
+                }
+                data = data[0]
             }
             return data
         }
         const marker = L.marker(pos(church.geometry.coordinates).reverse(), {
             title: church.properties.name,
             riseOnHover: true
-        }).addTo(map).on('click', () => console.log(church))
+        }).on('click', () => console.log(church))
         const props = church.properties
         const content = (props.name ? "<b>" + props.name + "</b>" : "") + (props.denomination ? "<br>" + props.denomination : "")
         if(content) {
@@ -56,9 +58,12 @@
                 maxWidth: 500
             })
         }
+        return marker
     }
     fetch("overpass-export.geojson")
         .then(response => response.json())
-        .then(json => json.features.forEach(placeMarker));
+        .then(json => json.features
+            .map(createMarker)
+            .forEach(churches.addLayer.bind(churches)))
 </script>
 </html>
