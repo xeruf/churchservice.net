@@ -20,10 +20,9 @@ The original search was:
 [out:json][timeout:25];
 // gather results
 (
-  // query part for: “amenity=place_of_worship and religion=christian”
-  node["amenity"="place_of_worship"]["religion"="christian"]({{bbox}});
-  way["amenity"="place_of_worship"]["religion"="christian"]({{bbox}});
-  relation["amenity"="place_of_worship"]["religion"="christian"]({{bbox}});
+    // query part for: “amenity=place_of_worship and religion=christian”
+    node["amenity"="place_of_worship"]["religion"="christian"](52.274880130680536,12.9254150390625,52.73462861156322,13.830413818359375);
+    way["amenity"="place_of_worship"]["religion"="christian"](52.274880130680536,12.9254150390625,52.73462861156322,13.830413818359375);
 );
 // print results
 out body;
