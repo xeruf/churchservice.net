@@ -2,14 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Test - Gottesdienst in Berlin</title>
+    <title>Finde deinen Gottesdienst in Berlin - Demo</title>
+    <!-- Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
           integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
           crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
             integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
             crossorigin=""></script>
-    <link href="res/style.css" type="text/css" rel="stylesheet"/>
+    <!-- Leaflet.Markercluster -->
+    <script src='https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js'></script>
+    <link href='https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css' rel='stylesheet' />
+    <link href='https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css' rel='stylesheet' />
+    <link rel="stylesheet" href="res/style.css" type="text/css"/>
 </head>
 <body>
 <div id="map"></div>
@@ -32,7 +37,10 @@
         shadowUrl: new URL(L.Icon.Default.prototype.options.shadowUrl, L.Icon.Default.prototype._detectIconPath()).href,
     });
 
-    const churches = L.featureGroup().addTo(map)
+    const churches = L.markerClusterGroup({
+        disableClusteringAtZoom: 15,
+        spiderfyOnMaxZoom: false,
+    }).addTo(map)
     function createMarker(church) {
         function pos(ar) {
             let data = ar
