@@ -64,6 +64,7 @@
         }).on('click', () => console.log(church))
         const props = church.properties
         marker.properties = props
+        marker.properties.searchName = props.name.toLowerCase()
         function joinFiltered(delim, ...values) {
             return values.filter(it => it !== undefined && it.length > 0).join(delim)
         }
@@ -87,19 +88,40 @@
         .then(json => json.features
             .filter(church => church.properties.name)
             .map(createMarker))
-    filter(document.getElementById("filterbox").value)
-
-    function filter(string) {
-        markers.then(markers => {
-            markers
-
-                .forEach(church => {
-                    if (!string || church.properties.name.toLowerCase().includes(string.toLowerCase()))
-                        churches.addLayer(church)
-                    else
-                        churches.removeLayer(church)
-                })
+        .then(markers => {
+            hidden = markers
+            filter(document.getElementById("filterbox").value)
         })
+
+    let visible = [];
+    let hidden = [];
+    function filter(string) {
+        const term = string ? string.toLowerCase() : ""
+        const predicate = term.length === 0 ? () => true :
+            church => church.properties.searchName.includes(term)
+
+        const keepVisible = []
+        const toHide = []
+        visible.forEach(it => {
+            if (predicate(it))
+                keepVisible.push(it)
+            else
+                toHide.push(it)
+        })
+        churches.removeLayers(toHide)
+
+        const keepHidden = []
+        const toShow = []
+        hidden.forEach(it => {
+            if (predicate(it))
+                toShow.push(it)
+            else
+                keepHidden.push(it)
+        })
+        churches.addLayers(toShow)
+
+        visible = keepVisible.concat(toShow)
+        hidden = keepHidden.concat(toHide)
     }
 
 </script>
