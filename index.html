@@ -91,11 +91,14 @@
 
     function filter(string) {
         markers.then(markers => {
-            churches.clearLayers()
             markers
-                .filter(church => !string ||
-                    church.properties.name.toLowerCase().includes(string.toLowerCase()))
-                .forEach(churches.addLayer.bind(churches))
+
+                .forEach(church => {
+                    if (!string || church.properties.name.toLowerCase().includes(string.toLowerCase()))
+                        churches.addLayer(church)
+                    else
+                        churches.removeLayer(church)
+                })
         })
     }
 
