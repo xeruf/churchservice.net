@@ -32,6 +32,13 @@ style="position: absolute; top: 10px; left: 50px; z-index: 999"/>
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map)
 
+    const churchIcon = L.icon({
+        ...L.Icon.Default.prototype.options,
+        iconUrl: new URL('res/marker-cross.png', document.location).href,
+        iconRetinaUrl: new URL('res/marker-cross-2x.png', document.location).href,
+        shadowUrl: new URL(L.Icon.Default.prototype.options.shadowUrl, L.Icon.Default.prototype._detectIconPath()).href,
+    });
+
     const churches = L.featureGroup().addTo(map)
     function createMarker(church) {
         function pos(ar) {
@@ -51,7 +58,8 @@ style="position: absolute; top: 10px; left: 50px; z-index: 999"/>
         }
         const marker = L.marker(pos(church.geometry.coordinates).reverse(), {
             title: church.properties.name,
-            riseOnHover: true
+            riseOnHover: true,
+            icon: churchIcon,
         }).on('click', () => console.log(church))
         const props = church.properties
         marker.properties = props
