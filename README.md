@@ -1,5 +1,9 @@
 # ogo - [Gottesdienste in Berlin](http://gottesdienst-in-berlin.de)
 
+## Brand colors
+- blue: 2fc2ff
+- orange: e96a3b
+
 ## [Overpass Query](https://overpass-turbo.eu)
 ```javascript
 /*

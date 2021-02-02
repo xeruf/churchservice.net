@@ -6,11 +6,46 @@ html, body {
 div#map {
   height: 100%;
 }
-#filterbox {
+
+#search {
   position: absolute;
-  top: 10px;
-  left: calc(50% - 100px);
-  width: 200px;
+  left: calc(50% - 10em);
+  top: 0;
   z-index: 999;
-  border: none;
+  input {
+    width: 20em;
+    font-size: 1em;
+    background: white url("search.png") no-repeat 0.75em;
+    background-size: .9em;
+
+    padding: 0.75em 0.5em 0.75em 2em;
+
+    border: none !important;
+    border-radius: 0 0 1em 1em;
+    outline: none;
+
+    &:focus {
+      background-image: url("search-orange.png");
+    }
+  }
+  $corner: 1em;
+  &::before, &::after {
+    // https://itnext.io/how-to-make-a-fancy-inverted-border-radius-in-css-5db048a53f95
+    content: "";
+    position: absolute;
+    top: 0;
+    height: $corner;
+    width: 2 * $corner;
+    background-color: transparent;
+  }
+  &::before {
+    left: -2 * $corner;
+    border-top-right-radius: $corner;
+    box-shadow: $corner 0 0 0 white;
+  }
+  &::after {
+    right: -2 * $corner;
+    border-top-left-radius: $corner;
+    box-shadow: -$corner 0 0 0 white;
+  }
 }

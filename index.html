@@ -18,7 +18,7 @@
 </head>
 <body>
 <div id="map"></div>
-<input type="text" id="filterbox" oninput="filter(this.value)" placeholder="Finde deinen Gottesdienst..."/>
+<div id="search"><input type="text" oninput="filter(this.value)" placeholder="Finde deinen Gottesdienst..."/></div>
 </body>
 <script>
     const map = L.map('map', {
@@ -90,7 +90,7 @@
             .map(createMarker))
         .then(markers => {
             hidden = markers
-            filter(document.getElementById("filterbox").value)
+            filter(document.getElementById("search").value)
         })
 
     let visible = [];
