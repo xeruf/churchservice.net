@@ -9,18 +9,11 @@
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
             integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
             crossorigin=""></script>
-    <style>
-        html, body {
-            height: 100%;
-            margin: 0;
-        }
-        #map { height: 100%; }
-    </style>
+    <link href="res/style.css" type="text/css" rel="stylesheet"/>
 </head>
 <body>
 <div id="map"></div>
-<input type="text" id="filterbox" oninput="filter(this.value)" placeholder="Finde deinen Gottesdienst..."
-style="position: absolute; top: 10px; left: 50px; z-index: 999"/>
+<input type="text" id="filterbox" oninput="filter(this.value)" placeholder="Finde deinen Gottesdienst..."/>
 </body>
 <script>
     const map = L.map('map', {

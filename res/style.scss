@@ -1,0 +1,16 @@
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+div#map {
+  height: 100%;
+}
+#filterbox {
+  position: absolute;
+  top: 10px;
+  left: calc(50% - 100px);
+  width: 200px;
+  z-index: 999;
+  border: none;
+}
