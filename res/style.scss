@@ -3,17 +3,49 @@ html, body {
   margin: 0;
 }
 
+body {
+  display: flex;
+  flex-direction: column;
+  font-size: 20px;
+}
+
 div#map {
-  height: 100%;
+  flex-grow: 1;
 }
 
 #search {
-  position: absolute;
-  left: calc(50% - 10em);
-  top: 0;
+  display: flex;
   z-index: 999;
-  input {
+  font-size: 2em;
+  @media (min-width: 40em) {
+    font-size: 1em;
+    position: absolute;
+    top: 0;
+    left: calc(50% - 10em);
     width: 20em;
+    $corner: 1em;
+    &::before, &::after {
+      // https://itnext.io/how-to-make-a-fancy-inverted-border-radius-in-css-5db048a53f95
+      content: "";
+      position: absolute;
+      top: 0;
+      height: $corner;
+      width: 2 * $corner;
+      background-color: transparent;
+    }
+    &::before {
+      left: -2 * $corner;
+      border-top-right-radius: $corner;
+      box-shadow: $corner 0 0 0 white;
+    }
+    &::after {
+      right: -2 * $corner;
+      border-top-left-radius: $corner;
+      box-shadow: -$corner 0 0 0 white;
+    }
+  }
+  input {
+    flex-grow: 1;
     font-size: 1em;
     background: white url("search.png") no-repeat 0.75em;
     background-size: .9em;
@@ -27,25 +59,5 @@ div#map {
     &:focus {
       background-image: url("search-orange.png");
     }
-  }
-  $corner: 1em;
-  &::before, &::after {
-    // https://itnext.io/how-to-make-a-fancy-inverted-border-radius-in-css-5db048a53f95
-    content: "";
-    position: absolute;
-    top: 0;
-    height: $corner;
-    width: 2 * $corner;
-    background-color: transparent;
-  }
-  &::before {
-    left: -2 * $corner;
-    border-top-right-radius: $corner;
-    box-shadow: $corner 0 0 0 white;
-  }
-  &::after {
-    right: -2 * $corner;
-    border-top-left-radius: $corner;
-    box-shadow: -$corner 0 0 0 white;
   }
 }
