@@ -16,9 +16,8 @@ div#map {
 #search {
   display: flex;
   z-index: 999;
-  font-size: 2em;
+  font-size: 1em;
   @media (min-width: 40em) {
-    font-size: 1em;
     position: absolute;
     top: 0;
     left: calc(50% - 10em);

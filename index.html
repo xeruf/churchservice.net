@@ -16,6 +16,7 @@
     <link href='https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css' rel='stylesheet' />
     <link href='https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css' rel='stylesheet' />
     <link rel="stylesheet" href="res/style.css" type="text/css"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 </head>
 <body>
 <div id="search"><input type="text" oninput="filter(this.value)" placeholder="Finde deinen Gottesdienst..."/></div>
@@ -35,11 +36,11 @@
         ...L.Icon.Default.prototype.options,
         iconUrl: new URL('res/marker-cross.png', document.location).href,
         iconRetinaUrl: new URL('res/marker-cross-2x.png', document.location).href,
-        shadowUrl: new URL(L.Icon.Default.prototype.options.shadowUrl, L.Icon.Default.prototype._detectIconPath()).href,
+        shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
     });
 
     const churches = L.markerClusterGroup({
-        disableClusteringAtZoom: 15,
+        disableClusteringAtZoom: 14,
         spiderfyOnMaxZoom: false,
     }).addTo(map)
     function createMarker(church) {
