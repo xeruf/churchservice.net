@@ -75,8 +75,10 @@
         function joinFiltered(delim, ...values) {
             return values.filter(it => it !== undefined && it.length > 0).join(delim)
         }
+        const name = props.name && "<b>" + props.name + "</b>"
         const content =
-            joinFiltered("<br>", props.name && "<b>" + props.name + "</b>",
+            joinFiltered('<br>',
+                props.website ? `<a href="${props.website}">${name}</a>` : name,
                 props.denomination && "<i>" + props.denomination + "</i>",
                 props.service_times && "Gottesdienst: " + props.service_times,
                 joinFiltered(" ", props["addr:street"], props["addr:housenumber"]),
