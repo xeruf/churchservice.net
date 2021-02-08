@@ -107,7 +107,8 @@
     function filter(string) {
         const term = string ? string.toLowerCase() : ""
         const predicate = term.length === 0 ? () => true :
-            church => church.properties.searchName.includes(term)
+            church => church.properties.searchName.includes(term) ||
+                (church.properties.denomination && church.properties.denomination.includes(term))
 
         const keepVisible = []
         const toHide = []
