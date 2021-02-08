@@ -23,10 +23,22 @@
 <div id="map"></div>
 </body>
 <script>
+    function updateUrl(newParams) {
+        // https://stackoverflow.com/a/65701780
+        let newUrl = new URL(window.location.href);
+        let params = new URLSearchParams(newUrl.search);
+        for(const [key, val] of Object.entries(newParams))
+            params.set(key, val)
+        newUrl.search = params.toString();
+        history.replaceState(null, '', newUrl.toString());
+    }
+
+    let newUrl = new URL(window.location.href);
+    let params = new URLSearchParams(newUrl.search);
     const map = L.map('map', {
-        center: [52.5, 13.4],
-        zoom: 13,
-        minZoom: 11,
+        center: [params.get('x') || 52.5, params.get('y') || 13.4],
+        zoom: params.get('z') || 13,
+        minZoom: 2,
     })
     L.tileLayer('https://{s}.tile.openstreetmap.de/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | <a onclick="editOSM()" href="#">Contribute</a>'
@@ -36,6 +48,13 @@
         maxZoom: 15,
         maximumAge: 600_000,
     });
+    map.on('moveend', (e) => {
+        updateUrl({
+            x: map.getCenter().lat.toPrecision(7),
+            y: map.getCenter().lng.toPrecision(7),
+            z: map.getZoom(),
+        })
+    })
 
     const churchIcon = L.icon({
         ...L.Icon.Default.prototype.options,
