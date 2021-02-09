@@ -94,18 +94,19 @@
         function joinFiltered(delim, ...values) {
             return values.filter(it => it !== undefined && it.length > 0).join(delim)
         }
-        const name = props.name && "<b>" + props.name + "</b>"
+        const name = props.name && '<b>' + props.name + '</b>'
         const content =
             joinFiltered('<br>',
-                props.website ? `<a href="${props.website}">${name}</a>` : name,
-                props.denomination && "<i>" + props.denomination + "</i>",
-                props.service_times && "Gottesdienst: " + props.service_times,
-                joinFiltered(" ", props["addr:street"], props["addr:housenumber"]),
-                joinFiltered(" ", props["addr:postcode"], props["addr:suburb"] || props["addr:city"]),
+                props.website ? `<a href='${props.website}'>${name}</a>` : name,
+                props.denomination && '<i>' + props.denomination + '</i>',
+                props.service_times && 'Gottesdienst: ' + props.service_times,
+                props['addr:street'] && (props['addr:street'] + ' ' + props['addr:housenumber']),
+                joinFiltered(' ', props['addr:postcode'], props['addr:suburb'] || props['addr:city']),
             )
         if(content.length > 0) {
             marker.bindPopup(content, {
-                maxWidth: 500
+                maxWidth: 500,
+                autoPanPadding: [80, 80],
             })
         }
         return marker
