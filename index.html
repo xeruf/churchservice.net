@@ -64,7 +64,9 @@
     });
 
     const churches = L.markerClusterGroup({
-        disableClusteringAtZoom: 14,
+        polygonOptions: { color: '#EE0', fillOpacity: 0.5 }, // https://leafletjs.com/reference.html#path-options
+        disableClusteringAtZoom: 13, // 14?
+        maxClusterRadius: 60,
         spiderfyOnMaxZoom: false,
     }).addTo(map)
     function createMarker(church) {
