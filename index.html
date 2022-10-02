@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Finde deinen Gottesdienst in Berlin - Demo</title>
+    <title>Find Your Church</title>
     <link rel="shortcut icon" href="res/favicon.ico">
     <!-- Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
@@ -19,7 +19,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 </head>
 <body>
-<div id="filters"><input id="search" type="text" autocomplete="off" oninput="filter(this.value)" placeholder="Finde deinen Gottesdienst..."/></div>
+<div id="filters">
+    <input id="search" type="text" autocomplete="off" oninput="filter(this.value)" placeholder="Finde deinen Gottesdienst..."/>
+    <!-- <a href="#">filter by service=today -> chain filters </a> -->
+</div>
 <div id="map"></div>
 </body>
 <script>
@@ -35,6 +38,9 @@
 
     let newUrl = new URL(window.location.href);
     let params = new URLSearchParams(newUrl.search);
+
+    document.getElementById('search').value = params.get('search')
+
     const map = L.map('map', {
         center: [params.get('x') || 52.5, params.get('y') || 13.4],
         zoom: params.get('z') || 13,
@@ -85,24 +91,25 @@
             }
             return data
         }
+
+        const props = church.properties
         const marker = L.marker(pos(church.geometry.coordinates).reverse(), {
-            title: church.properties.name,
+            title: props.name,
             riseOnHover: true,
             icon: churchIcon,
         }).on('click', () => console.log(church))
-        const props = church.properties
         marker.properties = props
-        marker.properties.searchName = props.name.toLowerCase()
+        marker.properties.searchName = props.name.toString().toLowerCase()
         function joinFiltered(delim, ...values) {
             return values.filter(it => it !== undefined && it.length > 0).join(delim)
         }
         const name = props.name && '<b>' + props.name + '</b>'
         const content =
             joinFiltered('<br>',
-                props.website ? `<a href='${props.website}'>${name}</a>` : name,
+                props.website ? `<a target="_blank" href='${props.website}'>${name}</a>` : name,
                 props.denomination && '<i>' + props.denomination + '</i>',
-                props.service_times && 'Gottesdienst: ' + props.service_times,
-                props['addr:street'] && (props['addr:street'] + ' ' + props['addr:housenumber']),
+                props.service_times && 'Service: ' + props.service_times, // TODO parse properly
+                joinFiltered(' ', props['addr:street'], props['addr:housenumber']),
                 joinFiltered(' ', props['addr:postcode'], props['addr:suburb'] || props['addr:city']),
             )
         if(content.length > 0) {
@@ -114,20 +121,21 @@
         return marker
     }
 
-    const markers = fetch("overpass-export.geojson")
+    const markers = fetch('churches-all.geojson')
         .then(response => response.json())
         .then(json => json.features
             .filter(church => church.properties.name)
             .map(createMarker))
         .then(markers => {
             hidden = markers
-            filter(document.getElementById("search").value)
+            filter(document.getElementById('search').value)
         })
 
     let visible = [];
     let hidden = [];
     function filter(string) {
-        const term = string ? string.toLowerCase() : ""
+        updateUrl({ search: string })
+        const term = string ? string.toLowerCase() : ''
         const predicate = term.length === 0 ? () => true :
             church => church.properties.searchName.includes(term) ||
                 (church.properties.denomination && church.properties.denomination.includes(term))
