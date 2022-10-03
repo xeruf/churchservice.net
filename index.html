@@ -109,7 +109,7 @@
                 props.website ? `<a target="_blank" href='${props.website}'>${name}</a>` : name,
                 props.denomination && '<i>' + props.denomination + '</i>',
                 props.service_times && 'Service: ' + props.service_times, // TODO parse properly
-                joinFiltered(' ', props['addr:street'], props['addr:housenumber']),
+                props['addr:street'] && joinFiltered(' ', props['addr:street'], props['addr:housenumber']),
                 joinFiltered(' ', props['addr:postcode'], props['addr:suburb'] || props['addr:city']),
             )
         if(content.length > 0) {
@@ -121,7 +121,7 @@
         return marker
     }
 
-    const markers = fetch('churches-all.geojson')
+    const markers = fetch('churches.geojson')
         .then(response => response.json())
         .then(json => json.features
             .filter(church => church.properties.name)
