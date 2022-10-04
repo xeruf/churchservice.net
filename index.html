@@ -5,16 +5,12 @@
     <title>Find Your Church</title>
     <link rel="shortcut icon" href="res/favicon.ico">
     <!-- Leaflet -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
-          integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
-          crossorigin=""/>
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
-            integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
-            crossorigin=""></script>
+    <link rel="stylesheet" href="./node_modules/leaflet/dist/leaflet.css"/>
+    <script src="./node_modules/leaflet/dist/leaflet.js"/></script>
     <!-- Leaflet.Markercluster -->
-    <script src='https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js'></script>
-    <link href='https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css' rel='stylesheet' />
-    <link href='https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css' rel='stylesheet' />
+    <script src='./node_modules/leaflet.markercluster/dist/leaflet.markercluster.js'></script>
+    <link href='./node_modules/leaflet.markercluster/dist/MarkerCluster.css' rel='stylesheet' />
+    <link href='./node_modules/leaflet.markercluster/dist/MarkerCluster.Default.css' rel='stylesheet' />
     <link rel="stylesheet" href="res/style.css" type="text/css"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 </head>
@@ -26,6 +22,8 @@
 <div id="map"></div>
 </body>
 <script>
+    const maxZoomCluster = 16 // 13-16 depending on density
+
     function updateUrl(newParams) {
         // https://stackoverflow.com/a/65701780
         let newUrl = new URL(window.location.href);
@@ -49,10 +47,11 @@
     L.tileLayer('https://{s}.tile.openstreetmap.de/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | <a onclick="editOSM()" href="#">Contribute</a>'
     }).addTo(map)
-    map.locate({
+    params.has('x') || params.has('y') || map.locate({
         setView: true,
-        maxZoom: 15,
-        maximumAge: 600_000,
+        maxZoom: maxZoomCluster,
+        //minZoom: 10,
+        maximumAge: 600_000, // 10 minutes
     });
     map.on('moveend', (e) => {
         updateUrl({
@@ -66,14 +65,14 @@
         ...L.Icon.Default.prototype.options,
         iconUrl: new URL('res/marker-cross.svg', document.location).href,
         iconRetinaUrl: undefined,
-        shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+        shadowUrl: './node_modules/leaflet/dist/images/marker-shadow.png',
     });
 
     const churches = L.markerClusterGroup({
         polygonOptions: { color: '#EE0', fillOpacity: 0.5 }, // https://leafletjs.com/reference.html#path-options
-        disableClusteringAtZoom: 13, // 14?
-        maxClusterRadius: 60,
-        spiderfyOnMaxZoom: false,
+        disableClusteringAtZoom: maxZoomCluster,
+        maxClusterRadius: 100,
+        //spiderfyOnMaxZoom: false,
     }).addTo(map)
     function createMarker(church) {
         function pos(ar) {
