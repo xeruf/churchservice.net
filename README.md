@@ -1,9 +1,3 @@
-# Online GOttesdienst - [Gottesdienste in Berlin](http://gottesdienst-in-berlin.de)
-
-## GdiB Brand colors
-- blue: #2FC2FF
-- orange: #E96A3B
-
 ## Setup
 
 Install `npm` and `dart-sass`, on arch:
@@ -18,8 +12,16 @@ sass .
 Run a webserver from the local files, for example:
 
     caddy file-server --listen :8888
+    
+https://caddyserver.com/docs/quick-starts/static-files
 
 ## Internals
+
+*O*nline *Go*ttesdienst - Rework für [Gottesdienste in Berlin](http://gottesdienst-in-berlin.de)
+
+## GdiB Brand colors
+- blue: #2FC2FF
+- orange: #E96A3B
 
 ### [Overpass Query](https://overpass-turbo.eu)
 ```javascript
@@ -42,6 +44,8 @@ out skel qt;
 ```
 
 ### Business
+
+https://wiki.openstreetmap.org/wiki/Map_features#Craft
 
 Businesses:
 craft

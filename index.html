@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Find Your Church</title>
+    <title>UnternehmerLand</title>
     <link rel="shortcut icon" href="res/favicon.ico">
     <!-- Leaflet -->
     <link rel="stylesheet" href="./node_modules/leaflet/dist/leaflet.css"/>
@@ -11,15 +11,24 @@
     <script src='./node_modules/leaflet.markercluster/dist/leaflet.markercluster.js'></script>
     <link href='./node_modules/leaflet.markercluster/dist/MarkerCluster.css' rel='stylesheet' />
     <link href='./node_modules/leaflet.markercluster/dist/MarkerCluster.Default.css' rel='stylesheet' />
+
+    <script src='./node_modules/overpass-layer/dist/overpass-layer.js'></script>
     <link rel="stylesheet" href="res/style.css" type="text/css"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 </head>
 <body>
-<div id="filters">
-    <input id="search" type="text" autocomplete="off" oninput="filter(this.value)" placeholder="Finde deinen Gottesdienst..."/>
+<div class="overlay" id="filters">
+    <input class="fontIcon" id="search" type="text" autocomplete="off" oninput="filter(this.value)" placeholder="Filtern..."/>
+    <button id="loadAll" onclick="loadAll()">Alles Laden (ca. 1GB)</a>
     <!-- <a href="#">filter by service=today -> chain filters </a> -->
 </div>
 <div id="map"></div>
+<div class="overlay" id="layers">
+    <button class="layer-toggle fontIcon" id="cafe" onclick="toggleLayer()">&#127860;</a>
+    <button class="layer-toggle fontIcon" id="craft" onclick="toggleLayer()">🔨</a>
+    <button class="layer-toggle fontIcon" id="office" onclick="toggleLayer()">🏢</a>
+    <!-- <a href="#">filter by service=today -> chain filters </a> -->
+</div>
 </body>
 <script>
     const maxZoomCluster = 16 // 13-16 depending on density
@@ -42,7 +51,7 @@
     const map = L.map('map', {
         center: [params.get('x') || 52.5, params.get('y') || 13.4],
         zoom: params.get('z') || 13,
-        minZoom: 2,
+        minZoom: 3,
     })
     L.tileLayer('https://{s}.tile.openstreetmap.de/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | <a onclick="editOSM()" href="#">Contribute</a>'
@@ -50,8 +59,10 @@
     params.has('x') || params.has('y') || map.locate({
         setView: true,
         maxZoom: maxZoomCluster,
-        //minZoom: 10,
         maximumAge: 600_000, // 10 minutes
+        //timeout: 2000,
+        // TODO simulate movement and test watch: true,
+        // console.log("Map Moved") map.stopLocate()
     });
     map.on('moveend', (e) => {
         updateUrl({
@@ -59,6 +70,13 @@
             y: map.getCenter().lng.toPrecision(7),
             z: map.getZoom(),
         })
+        for(key in overpassLayers) {
+            const layer = overpassLayers[key]
+            const minZoom = layer.options.minZoom
+            if(layer.map && map.getZoom() < minZoom) {
+                document.getElementById(key).click()
+            }
+        }
     })
 
     const churchIcon = L.icon({
@@ -99,14 +117,22 @@
         }).on('click', () => console.log(church))
         marker.properties = props
         marker.properties.searchName = props.name.toString().toLowerCase()
+        function nonBlank(string) {
+            return string !== undefined && string.length > 0
+        }
         function joinFiltered(delim, ...values) {
-            return values.filter(it => it !== undefined && it.length > 0).join(delim)
+            return values.filter(it => nonBlank(it)).join(delim)
+        }
+        function surround(content, prefix, suffix, condition) {
+            return nonBlank(arguments.length > 3 ? condition : content) ? joinFiltered('', prefix, content, suffix) : content
         }
         const name = props.name && '<b>' + props.name + '</b>'
         const content =
             joinFiltered('<br>',
-                props.website ? `<a target="_blank" href='${props.website}'>${name}</a>` : name,
-                props.denomination && '<i>' + props.denomination + '</i>',
+                surround(name, `<a target="_blank" href='${props.website}'>`, '</a>', props.website),
+                surround(props.craft, "Handwerk: "),
+                surround(props.office, "Büro: "),
+                surround(props.denomination, '<i>', '</i>'),
                 props.service_times && 'Service: ' + props.service_times, // TODO parse properly
                 props['addr:street'] && joinFiltered(' ', props['addr:street'], props['addr:housenumber']),
                 joinFiltered(' ', props['addr:postcode'], props['addr:suburb'] || props['addr:city']),
@@ -120,15 +146,20 @@
         return marker
     }
 
-    const markers = fetch('churches.geojson')
-        .then(response => response.json())
-        .then(json => json.features
-            .filter(church => church.properties.name)
-            .map(createMarker))
-        .then(markers => {
-            hidden = markers
-            filter(document.getElementById('search').value)
-        })
+    function loadAll() {
+        const button = event.target //document.getElementById('loadAll')
+        button.disabled = true
+        const markers = fetch('osm/planet-220926-craft.geojson')
+            .then(response => response.json())
+            .then(json => json.features
+                .filter(church => church.properties.name)
+                .map(createMarker))
+            .then(markers => {
+                hidden = markers
+                filter(document.getElementById('search').value)
+                button.remove()
+            })
+    }
 
     let visible = [];
     let hidden = [];
@@ -171,6 +202,54 @@
             pos = map._popup._latlng
         }
         window.open(`https://www.openstreetmap.org/edit#map=${zoom}/${pos.lat}/${pos.lng}`, '_blank');
+    }
+</script>
+<script>
+    var overpassFrontend = new OverpassFrontend('//overpass-api.de/api/interpreter')
+    const overpassLayers = {
+        cafe: new OverpassLayer({
+            query: '(node[amenity~"^(restaurant|cafe)$"];way[amenity~"^(restaurant|cafe)$"];);',
+            minZoom: 15,
+            feature: {
+              body: "{{ tags.amenity }}<br/>Cuisine: {{ tags.cuisine|default('unknown') }}",
+              style: 'color: transparent; fillColor: transparent',
+              markerSymbol: "<img src='res/map_pointer.png' width='25' height='42' anchorX='13' anchorY='42' signAnchorX='0' signAnchorY='-30'>",
+              markerSign: '{% if tags.amenity=="restaurant" %}&#127860;{% elseif tags.amenity=="cafe" %}&#9749;{% endif %}'
+            }
+        }),
+        craft: new OverpassLayer({
+            query: 'nwr[craft]',
+            minZoom: 13,
+            feature: {
+              style: 'color: transparent; fillColor: transparent',
+              markerSymbol: "<img src='res/map_pointer.png' width='25' height='42' anchorX='13' anchorY='42' signAnchorX='0' signAnchorY='-30'>",
+              markerSign: '🔨'
+            }
+        }),
+        office: new OverpassLayer({
+            query: 'nwr[office]',
+            minZoom: 14,
+            feature: {
+              style: 'color: transparent; fillColor: transparent',
+              markerSymbol: "<img src='res/map_pointer.png' width='25' height='42' anchorX='13' anchorY='42' signAnchorX='0' signAnchorY='-30'>",
+              markerSign: '🏢'
+            }
+        }),
+    }
+    function toggleLayer() {
+        const button = event.target
+        const key = button.id
+        const layer = overpassLayers[key]
+        if(button.classList.contains('active')) {
+            button.classList.remove('active')
+            layer.remove()
+        } else {
+            button.classList.add('active')
+            layer.addTo(map)
+            const minZoom = layer.options.minZoom
+            if(map.getZoom() < minZoom)
+                map.setZoom(minZoom)
+        }
     }
 </script>
 </html>

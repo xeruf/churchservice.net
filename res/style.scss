@@ -1,3 +1,5 @@
+// TODO migrate to real SASS
+
 html, body {
   height: 100%;
   margin: 0;
@@ -17,52 +19,83 @@ div#map {
   flex-grow: 1;
 }
 
-#filters {
+.overlay {
   display: flex;
   z-index: 999;
   font-size: 1.5em;
 
   padding: 0.75em 0.5em;
   background: white;
-  border-radius: 0 0 1em 1em;
   @media (min-width: 40em) {
     position: absolute;
-    top: 0;
+    $corner: 1em;
+    &#filters {
+      top: 0;
+      border-radius: 0 0 1em 1em;
+      &::before, &::after {top: 0;}
+      &::before {border-top-right-radius: $corner;}
+      &::after {border-top-left-radius: $corner;}
+    }
+    &#layers {
+      bottom: 0;
+      border-radius: 1em 1em 0 0;
+      &::before, &::after {bottom: 0;}
+      &::before {border-bottom-right-radius: $corner;}
+      &::after {border-bottom-left-radius: $corner;}
+    }
     left: calc(50% - 10em);
     width: 20em;
-    $corner: 1em;
     &::before, &::after {
       // https://itnext.io/how-to-make-a-fancy-inverted-border-radius-in-css-5db048a53f95
       content: "";
       position: absolute;
-      top: 0;
       height: $corner;
       width: 2 * $corner;
       background-color: transparent;
+      z-index: -1;
     }
     &::before {
       left: -2 * $corner;
-      border-top-right-radius: $corner;
       box-shadow: $corner 0 0 0 white;
     }
     &::after {
       right: -2 * $corner;
-      border-top-left-radius: $corner;
       box-shadow: -$corner 0 0 0 white;
     }
   }
-  input {
-    flex-grow: 1;
+
+  #layers {
+    bottom: 0
+  }
+
+  .fontIcon {
     font-size: 1em;
-    padding-left: 1.5em;
-    background: url("search.png") no-repeat 0.25em;
-    background-size: .9em;
+    flex-grow: 1;
+    padding: 0 0 0 1.5em;
 
     border: none !important;
     outline: none;
+  }
+  input#search {
+    background: url("search.png") no-repeat 0.25em;
+    background-size: .9em;
 
     &:focus {
       background-image: url("search-orange.png");
     }
+  }
+
+  button.layer-toggle {
+    cursor: "pointer";
+    &.active {
+      background-color: yellow;
+    }
+  }
+
+  a {
+    margin: 0 .5em;
+    width: 1.4em;
+    background: url("filter-time.svg") no-repeat;
+    background-size: 1.4em;
   }
 }
