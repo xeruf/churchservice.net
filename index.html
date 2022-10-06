@@ -273,11 +273,11 @@
             button.classList.remove('active')
             layer.remove()
         } else {
-            button.classList.add('active')
-            layer.addTo(map)
             const minZoom = layer.options.minZoom
             if(map.getZoom() < minZoom)
                 map.setZoom(minZoom)
+            button.classList.add('active')
+            layer.addTo(map)
         }
     }
 </script>
