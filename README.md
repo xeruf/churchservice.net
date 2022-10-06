@@ -53,3 +53,5 @@ office
 shop
 
 Handelsregister to onosm.org
+
+https://www.wikiwand.com/de/Handelsregister_(Deutschland)#Abteilungen

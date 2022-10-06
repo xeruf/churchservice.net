@@ -19,7 +19,10 @@
 <body>
 <div class="overlay" id="filters">
     <input class="fontIcon" id="search" type="text" autocomplete="off" oninput="filter(this.value)" placeholder="Filtern..."/>
-    <button id="loadAll" onclick="loadAll()">Alles Laden (ca. 1GB)</a>
+    <div id="loaders">
+        <button onclick="loadAll()">Globale Daten Laden (ca. 1 GB)</button>
+        <button onclick="loadRegister()">Register Laden (ca. 50 MB)</button>
+    </div>
     <!-- <a href="#">filter by service=today -> chain filters </a> -->
 </div>
 <div id="map"></div>
@@ -51,7 +54,7 @@
     const map = L.map('map', {
         center: [params.get('x') || 52.5, params.get('y') || 13.4],
         zoom: params.get('z') || 13,
-        minZoom: 3,
+        minZoom: 2,
     })
     L.tileLayer('https://{s}.tile.openstreetmap.de/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | <a onclick="editOSM()" href="#">Contribute</a>'
@@ -61,7 +64,7 @@
         maxZoom: maxZoomCluster,
         maximumAge: 600_000, // 10 minutes
         //timeout: 2000,
-        // TODO simulate movement and test watch: true,
+        // watch: true, TODO simulate movement and test
         // console.log("Map Moved") map.stopLocate()
     });
     map.on('moveend', (e) => {
@@ -81,7 +84,7 @@
 
     const churchIcon = L.icon({
         ...L.Icon.Default.prototype.options,
-        iconUrl: new URL('res/marker-cross.svg', document.location).href,
+        iconUrl: new URL('res/marker.svg', document.location).href,
         iconRetinaUrl: undefined,
         shadowUrl: './node_modules/leaflet/dist/images/marker-shadow.png',
     });
@@ -109,12 +112,17 @@
             return data
         }
 
-        const props = church.properties
-        const marker = L.marker(pos(church.geometry.coordinates).reverse(), {
+        const props = church.properties || church
+        if(!props.name)
+            return null
+        const coords = church.geometry ? pos(church.geometry.coordinates).reverse() : church.c
+        if(coords.length === 0)
+            return null
+        const marker = L.marker(coords, {
             title: props.name,
             riseOnHover: true,
             icon: churchIcon,
-        }).on('click', () => console.log(church))
+        }).on('click', () => console.log("Selected", church))
         marker.properties = props
         marker.properties.searchName = props.name.toString().toLowerCase()
         function nonBlank(string) {
@@ -130,12 +138,17 @@
         const content =
             joinFiltered('<br>',
                 surround(name, `<a target="_blank" href='${props.website}'>`, '</a>', props.website),
+                // Business
                 surround(props.craft, "Handwerk: "),
                 surround(props.office, "Büro: "),
+                // Church
                 surround(props.denomination, '<i>', '</i>'),
                 props.service_times && 'Service: ' + props.service_times, // TODO parse properly
+                // Address
                 props['addr:street'] && joinFiltered(' ', props['addr:street'], props['addr:housenumber']),
                 joinFiltered(' ', props['addr:postcode'], props['addr:suburb'] || props['addr:city']),
+                // Extra
+                props.id,
             )
         if(content.length > 0) {
             marker.bindPopup(content, {
@@ -147,19 +160,32 @@
     }
 
     function loadAll() {
-        const button = event.target //document.getElementById('loadAll')
+        const button = event.target
         button.disabled = true
         const markers = fetch('osm/planet-220926-craft.geojson')
             .then(response => response.json())
-            .then(json => json.features
-                .filter(church => church.properties.name)
-                .map(createMarker))
+            .then(json => json.features.map(createMarker).filter(marker => marker !== null))
             .then(markers => {
                 hidden = markers
                 filter(document.getElementById('search').value)
                 button.remove()
             })
     }
+    function loadRegister(register) {
+        if(event) {
+            const button = event.target
+            button.disabled = true
+        }
+        const markers = fetch(register)
+            .then(response => response.json())
+            .then(json => json.map(createMarker).filter(marker => marker !== null))
+            .then(markers => {
+                hidden = markers
+                filter(document.getElementById('search').value)
+                if(event) button.remove()
+            })
+    }
+    loadRegister('register.json')
 
     let visible = [];
     let hidden = [];
@@ -213,7 +239,7 @@
             feature: {
               body: "{{ tags.amenity }}<br/>Cuisine: {{ tags.cuisine|default('unknown') }}",
               style: 'color: transparent; fillColor: transparent',
-              markerSymbol: "<img src='res/map_pointer.png' width='25' height='42' anchorX='13' anchorY='42' signAnchorX='0' signAnchorY='-30'>",
+              markerSymbol: "<img src='res/marker.svg' width='25' height='41' anchorX='15' anchorY='42' signAnchorX='0' signAnchorY='-30'>",
               markerSign: '{% if tags.amenity=="restaurant" %}&#127860;{% elseif tags.amenity=="cafe" %}&#9749;{% endif %}'
             }
         }),
@@ -222,7 +248,7 @@
             minZoom: 13,
             feature: {
               style: 'color: transparent; fillColor: transparent',
-              markerSymbol: "<img src='res/map_pointer.png' width='25' height='42' anchorX='13' anchorY='42' signAnchorX='0' signAnchorY='-30'>",
+              markerSymbol: "<img src='res/marker.svg' width='25' height='41' anchorX='15' anchorY='42' signAnchorX='0' signAnchorY='-30'>",
               markerSign: '🔨'
             }
         }),
@@ -231,7 +257,7 @@
             minZoom: 14,
             feature: {
               style: 'color: transparent; fillColor: transparent',
-              markerSymbol: "<img src='res/map_pointer.png' width='25' height='42' anchorX='13' anchorY='42' signAnchorX='0' signAnchorY='-30'>",
+              markerSymbol: "<img src='res/marker.svg' width='25' height='41' anchorX='15' anchorY='42' signAnchorX='0' signAnchorY='-30'>",
               markerSign: '🏢'
             }
         }),

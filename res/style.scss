@@ -64,19 +64,16 @@ div#map {
     }
   }
 
-  #layers {
-    bottom: 0
-  }
-
+  // TOP
   .fontIcon {
     font-size: 1em;
     flex-grow: 1;
-    padding: 0 0 0 1.5em;
 
     border: none !important;
     outline: none;
   }
   input#search {
+    padding: 0 0 0 1.5em;
     background: url("search.png") no-repeat 0.25em;
     background-size: .9em;
 
@@ -85,17 +82,26 @@ div#map {
     }
   }
 
-  button.layer-toggle {
-    cursor: "pointer";
-    &.active {
-      background-color: yellow;
-    }
-  }
-
   a {
     margin: 0 .5em;
     width: 1.4em;
     background: url("filter-time.svg") no-repeat;
     background-size: 1.4em;
+  }
+
+  &#filters #loaders {
+    display: flex;
+    flex-direction: column;
+    button {
+      font-size: 0.3em;
+    }
+  }
+
+  // BOTTOM
+  button.layer-toggle {
+    cursor: "pointer";
+    &.active {
+      background-color: #EE0;
+    }
   }
 }
