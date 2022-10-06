@@ -19,10 +19,10 @@
 <body>
 <div class="overlay" id="filters">
     <input class="fontIcon" id="search" type="text" autocomplete="off" oninput="filter(this.value)" placeholder="Filtern..."/>
-    <div id="loaders">
+    <!-- <div id="loaders">
         <button onclick="loadAll()">Globale Daten Laden (ca. 1 GB)</button>
         <button onclick="loadRegister()">Register Laden (ca. 50 MB)</button>
-    </div>
+    </div> -->
     <!-- <a href="#">filter by service=today -> chain filters </a> -->
 </div>
 <div id="map"></div>
@@ -94,7 +94,8 @@
     const churches = L.markerClusterGroup({
         polygonOptions: { color: '#EE0', fillOpacity: 0.5 }, // https://leafletjs.com/reference.html#path-options
         disableClusteringAtZoom: maxZoomCluster,
-        maxClusterRadius: 100,
+        maxClusterRadius: 70,
+        //maxClusterRadius: 100,
         //spiderfyOnMaxZoom: false,
     }).addTo(map)
     function createMarker(church) {
