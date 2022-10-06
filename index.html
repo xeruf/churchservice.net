@@ -34,7 +34,7 @@
 </div>
 </body>
 <script>
-    const maxZoomCluster = 16 // 13-16 depending on density
+    const maxZoomCluster = 13 // 13-16 depending on density
 
     function updateUrl(newParams) {
         // https://stackoverflow.com/a/65701780
@@ -51,9 +51,11 @@
 
     document.getElementById('search').value = params.get('search')
 
+    // Berlin const defaultPos = { x: 52.5, y: 13.4, z: 13 }
+    const defaultPos = { x: 50.7, y: 8.8, z: 8 }
     const map = L.map('map', {
-        center: [params.get('x') || 52.5, params.get('y') || 13.4],
-        zoom: params.get('z') || 13,
+        center: [params.get('x') || defaultPos.x, params.get('y') || defaultPos.y],
+        zoom: params.get('z') || defaultPos.z,
         minZoom: 2,
     })
     L.tileLayer('https://{s}.tile.openstreetmap.de/{z}/{x}/{y}.png', {
