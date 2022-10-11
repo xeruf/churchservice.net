@@ -23,6 +23,8 @@ div#map {
   display: flex;
   z-index: 999;
   font-size: 1.5em;
+  max-height: 3em;
+  overflow: hidden;
 
   padding: 0.75em 0.5em;
   background: white;
@@ -92,7 +94,7 @@ div#map {
   &#filters #loaders {
     display: flex;
     flex-direction: column;
-    width: 3em;
+    width: 4em;
     button {
       font-size: 0.3em;
     }
