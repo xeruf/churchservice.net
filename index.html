@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>UnternehmerLand</title>
-    <link rel="shortcut icon" href="res/favicon.ico">
+    <link rel="shortcut icon" href="res/marker.webp">
     <!-- Leaflet -->
     <link rel="stylesheet" href="./node_modules/leaflet/dist/leaflet.css"/>
     <script src="./node_modules/leaflet/dist/leaflet.js"/></script>
@@ -311,10 +311,11 @@
     }
 
     if(churchMap) {
-      document.getElementById('loaders').innerHTML =
-          `<button onclick="loadRegister('churches.geojson')">Globale Kirchen Laden (ca. 700 MB)</button>
-          <button onclick="loadRegister('churches-berlin-overpass.geojson')">Berliner Kirchen Laden (ca. 2 MB)</button>`
-      document.getElementById('church').click()
+        document.getElementById('loaders').innerHTML =
+            `<button onclick="loadRegister('churches.geojson')">Globale Kirchen Laden (ca. 700 MB)</button>
+             <button onclick="loadRegister('churches-berlin-overpass.geojson')">Berliner Kirchen Laden (ca. 2 MB)</button>`
+            document.getElementById('church').click()
+        document.title = "Find Your Church"
     }
 </script>
 </html>
