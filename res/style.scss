@@ -92,6 +92,7 @@ div#map {
   &#filters #loaders {
     display: flex;
     flex-direction: column;
+    width: 3em;
     button {
       font-size: 0.3em;
     }

@@ -19,18 +19,19 @@
 <body>
 <div class="overlay" id="filters">
     <input class="fontIcon" id="search" type="text" autocomplete="off" oninput="filter(this.value)" placeholder="Filtern..."/>
-    <!-- <div id="loaders">
-        <button onclick="loadAll()">Globale Daten Laden (ca. 1 GB)</button>
-        <button onclick="loadRegister()">Register Laden (ca. 50 MB)</button>
-    </div> -->
+    <div id="loaders">
+        <button onclick="loadAll()">Globale Betriebe Laden (ca. 1 GB)</button>
+        <button onclick="loadRegister('register.json')">Register Laden (ca. 300 MB)</button>
+    </div>
     <!-- <a href="#">filter by service=today -> chain filters </a> -->
 </div>
 <div id="map"></div>
 <div class="overlay" id="layers">
-    <button class="layer-toggle fontIcon" id="cafe" onclick="toggleLayer()">&#127860;</a>
+    <button class="layer-toggle fontIcon" id="cafe" onclick="toggleLayer()">🍴</a> <!-- &#127860; -->
     <button class="layer-toggle fontIcon" id="craft" onclick="toggleLayer()">🔨</a>
     <button class="layer-toggle fontIcon" id="office" onclick="toggleLayer()">🏢</a>
-    <!-- <a href="#">filter by service=today -> chain filters </a> -->
+    <button class="layer-toggle fontIcon" id="kindergarten" onclick="toggleLayer()">🧒</a>
+    <button class="layer-toggle fontIcon" id="church" onclick="toggleLayer()">⛪</a>
 </div>
 </body>
 <script>
@@ -165,7 +166,7 @@
     function loadAll() {
         const button = event.target
         button.disabled = true
-        const markers = fetch('osm/planet-220926-craft.geojson')
+        const markers = fetch('planet-220926-craft.geojson')
             .then(response => response.json())
             .then(json => json.features.map(createMarker).filter(marker => marker !== null))
             .then(markers => {
@@ -188,8 +189,6 @@
                 if(event) button.remove()
             })
     }
-    loadRegister('register.json')
-    loadRegister('firmen-geo.json')
 
     let visible = [];
     let hidden = [];
@@ -251,6 +250,7 @@
             query: 'nwr[craft]',
             minZoom: 13,
             feature: {
+              body: "{{ tags.craft }}",
               style: 'color: transparent; fillColor: transparent',
               markerSymbol: "<img src='res/marker.svg' width='25' height='41' anchorX='15' anchorY='42' signAnchorX='0' signAnchorY='-30'>",
               markerSign: '🔨'
@@ -260,9 +260,30 @@
             query: 'nwr[office]',
             minZoom: 14,
             feature: {
+              body: "{{ tags.office }}",
               style: 'color: transparent; fillColor: transparent',
               markerSymbol: "<img src='res/marker.svg' width='25' height='41' anchorX='15' anchorY='42' signAnchorX='0' signAnchorY='-30'>",
               markerSign: '🏢'
+            }
+        }),
+        kindergarten: new OverpassLayer({
+            query: '(node[amenity~"^(kindergarten)$"];way[amenity~"^(kindergarten)$"];);',
+            minZoom: 12,
+            feature: {
+              body: "{{ tags.religion }}",
+              style: 'color: transparent; fillColor: transparent',
+              markerSymbol: "<img src='res/marker.svg' width='25' height='41' anchorX='15' anchorY='42' signAnchorX='0' signAnchorY='-30'>",
+              markerSign: '🧒'
+            }
+        }),
+        church: new OverpassLayer({
+            query: '(node["amenity"="place_of_worship"]["religion"="christian"];way["amenity"="place_of_worship"]["religion"="christian"];);',
+            minZoom: 14,
+            feature: {
+              body: "{{ tags.religion }}<br/>{{ tags.denomination }}",
+              style: 'color: transparent; fillColor: transparent',
+              markerSymbol: "<img src='res/marker.svg' width='25' height='41' anchorX='15' anchorY='42' signAnchorX='0' signAnchorY='-30'>",
+              markerSign: '⛪'
             }
         }),
     }
