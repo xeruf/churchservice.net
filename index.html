@@ -41,7 +41,7 @@
 
     const markerIcon = L.icon({
         ...L.Icon.Default.prototype.options,
-        iconUrl: new URL(`res/marker${churchMap && '-cross'}.svg`, window.location).href,
+        iconUrl: new URL(`res/marker${churchMap ? '-cross' : ''}.svg`, window.location).href,
         iconRetinaUrl: undefined,
         shadowUrl: './node_modules/leaflet/dist/images/marker-shadow.png',
     });
