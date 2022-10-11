@@ -35,23 +35,16 @@
 </div>
 </body>
 <script type="text/javascript">
-    var maxZoomCluster = 16 // 13-16 depending on density
+    const churchMap = window.location.href.includes('gemeinde') || window.location.href.includes('church')
+
+    const maxZoomCluster = churchMap ? 14 : 16 // 13-16 depending on density
 
     const markerIcon = L.icon({
         ...L.Icon.Default.prototype.options,
-        iconUrl: new URL('res/marker.svg', window.location).href,
+        iconUrl: new URL(`res/marker${churchMap && '-cross'}.svg`, window.location).href,
         iconRetinaUrl: undefined,
         shadowUrl: './node_modules/leaflet/dist/images/marker-shadow.png',
     });
-
-    if(window.location.href.includes('gemeinde') || window.location.href.includes('church')) {
-      maxZoomCluster = 14
-      document.getElementById('loaders').innerHTML =
-          `<button onclick="loadRegister('churches.geojson')">Globale Kirchen Laden (ca. 700 MB)</button>
-          <button onclick="loadRegister('churches-berlin-overpass.geojson')">Berliner Kirchen Laden (ca. 2 MB)</button>`
-      document.getElementById('church').click()
-      markerIcon.options.iconUrl = new URL('res/marker-cross.svg', window.location).href
-    }
 </script>
 <script type="text/javascript">
     function updateUrl(newParams) {
@@ -315,6 +308,13 @@
             button.classList.add('active')
             layer.addTo(map)
         }
+    }
+
+    if(churchMap) {
+      document.getElementById('loaders').innerHTML =
+          `<button onclick="loadRegister('churches.geojson')">Globale Kirchen Laden (ca. 700 MB)</button>
+          <button onclick="loadRegister('churches-berlin-overpass.geojson')">Berliner Kirchen Laden (ca. 2 MB)</button>`
+      document.getElementById('church').click()
     }
 </script>
 </html>
