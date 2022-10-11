@@ -1,2 +1,2 @@
 #!/bin/sh
-cp -rf index.html register.json node_modules/ res/ ..
+cp -rf index.html *.geojson node_modules/ res/ ..

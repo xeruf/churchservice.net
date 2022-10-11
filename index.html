@@ -21,7 +21,7 @@
     <input class="fontIcon" id="search" type="text" autocomplete="off" oninput="filter(this.value)" placeholder="Filtern..."/>
     <div id="loaders">
         <button onclick="loadAll()">Globale Betriebe Laden (ca. 1 GB)</button>
-        <button onclick="loadRegister('register.json')">Register Laden (ca. 300 MB)</button>
+        <button onclick="loadRegister('register.geojson')">Register Laden (ca. 300 MB)</button>
     </div>
     <!-- <a href="#">filter by service=today -> chain filters </a> -->
 </div>
@@ -34,15 +34,33 @@
     <button class="layer-toggle fontIcon" id="church" onclick="toggleLayer()">⛪</a>
 </div>
 </body>
-<script>
-    const maxZoomCluster = 13 // 13-16 depending on density
+<script type="text/javascript">
+    var maxZoomCluster = 16 // 13-16 depending on density
 
+    const markerIcon = L.icon({
+        ...L.Icon.Default.prototype.options,
+        iconUrl: new URL('res/marker.svg', window.location).href,
+        iconRetinaUrl: undefined,
+        shadowUrl: './node_modules/leaflet/dist/images/marker-shadow.png',
+    });
+
+    if(window.location.href.includes('gemeinde') || window.location.href.includes('church')) {
+      maxZoomCluster = 14
+      document.getElementById('loaders').innerHTML =
+          `<button onclick="loadRegister('churches.geojson')">Globale Kirchen Laden (ca. 700 MB)</button>
+          <button onclick="loadRegister('churches-berlin-overpass.geojson')">Berliner Kirchen Laden (ca. 2 MB)</button>`
+      document.getElementById('church').click()
+      markerIcon.options.iconUrl = new URL('res/marker-cross.svg', window.location).href
+    }
+</script>
+<script type="text/javascript">
     function updateUrl(newParams) {
         // https://stackoverflow.com/a/65701780
         let newUrl = new URL(window.location.href);
         let params = new URLSearchParams(newUrl.search);
-        for(const [key, val] of Object.entries(newParams))
-            params.set(key, val)
+        for(const [key, val] of Object.entries(newParams)) {
+            val ? params.set(key, val) : params.delete(key)
+        }
         newUrl.search = params.toString();
         history.replaceState(null, '', newUrl.toString());
     }
@@ -79,24 +97,19 @@
         for(key in overpassLayers) {
             const layer = overpassLayers[key]
             const minZoom = layer.options.minZoom
-            if(layer.map && map.getZoom() < minZoom) {
-                document.getElementById(key).click()
+            if(map.getZoom() < minZoom) {
+                document.getElementById(key).classList.add('inactive')
+            } else {
+                document.getElementById(key).classList.remove('inactive')
             }
         }
     })
 
-    const churchIcon = L.icon({
-        ...L.Icon.Default.prototype.options,
-        iconUrl: new URL('res/marker.svg', document.location).href,
-        iconRetinaUrl: undefined,
-        shadowUrl: './node_modules/leaflet/dist/images/marker-shadow.png',
-    });
-
-    const churches = L.markerClusterGroup({
+    const markers = L.markerClusterGroup({
         polygonOptions: { color: '#EE0', fillOpacity: 0.5 }, // https://leafletjs.com/reference.html#path-options
-        disableClusteringAtZoom: maxZoomCluster,
-        maxClusterRadius: 70,
+        maxClusterRadius: zoom => (zoom < maxZoomCluster) ? 70 : 1, // radius in pixels
         //maxClusterRadius: 100,
+        //disableClusteringAtZoom: maxZoomCluster,
         //spiderfyOnMaxZoom: false,
     }).addTo(map)
     function createMarker(church) {
@@ -125,7 +138,7 @@
         const marker = L.marker(coords, {
             title: props.name,
             riseOnHover: true,
-            icon: churchIcon,
+            icon: markerIcon,
         }).on('click', () => console.log("Selected", church))
         marker.properties = props
         marker.properties.searchName = props.name.toString().toLowerCase()
@@ -177,12 +190,13 @@
     }
     function loadRegister(register) {
         if(event) {
+            console.log('Event:', event)
             const button = event.target
             button.disabled = true
         }
         const markers = fetch(register)
             .then(response => response.json())
-            .then(json => json.map(createMarker).filter(marker => marker !== null))
+            .then(json => (json.features || json).map(createMarker).filter(marker => marker !== null))
             .then(markers => {
                 hidden = markers
                 filter(document.getElementById('search').value)
@@ -207,7 +221,7 @@
             else
                 toHide.push(it)
         })
-        churches.removeLayers(toHide)
+        markers.removeLayers(toHide)
 
         const keepHidden = []
         const toShow = []
@@ -217,7 +231,7 @@
             else
                 keepHidden.push(it)
         })
-        churches.addLayers(toShow)
+        markers.addLayers(toShow)
 
         visible = keepVisible.concat(toShow)
         hidden = keepHidden.concat(toHide)
@@ -233,7 +247,7 @@
         window.open(`https://www.openstreetmap.org/edit#map=${zoom}/${pos.lat}/${pos.lng}`, '_blank');
     }
 </script>
-<script>
+<script type="text/javascript">
     var overpassFrontend = new OverpassFrontend('//overpass-api.de/api/interpreter')
     const overpassLayers = {
         cafe: new OverpassLayer({
@@ -246,16 +260,6 @@
               markerSign: '{% if tags.amenity=="restaurant" %}&#127860;{% elseif tags.amenity=="cafe" %}&#9749;{% endif %}'
             }
         }),
-        craft: new OverpassLayer({
-            query: 'nwr[craft]',
-            minZoom: 13,
-            feature: {
-              body: "{{ tags.craft }}",
-              style: 'color: transparent; fillColor: transparent',
-              markerSymbol: "<img src='res/marker.svg' width='25' height='41' anchorX='15' anchorY='42' signAnchorX='0' signAnchorY='-30'>",
-              markerSign: '🔨'
-            }
-        }),
         office: new OverpassLayer({
             query: 'nwr[office]',
             minZoom: 14,
@@ -264,6 +268,16 @@
               style: 'color: transparent; fillColor: transparent',
               markerSymbol: "<img src='res/marker.svg' width='25' height='41' anchorX='15' anchorY='42' signAnchorX='0' signAnchorY='-30'>",
               markerSign: '🏢'
+            }
+        }),
+        craft: new OverpassLayer({
+            query: 'nwr[craft]',
+            minZoom: 13,
+            feature: {
+              body: "{{ tags.craft }}",
+              style: 'color: transparent; fillColor: transparent',
+              markerSymbol: "<img src='res/marker.svg' width='25' height='41' anchorX='15' anchorY='42' signAnchorX='0' signAnchorY='-30'>",
+              markerSign: '🔨'
             }
         }),
         kindergarten: new OverpassLayer({
@@ -291,7 +305,7 @@
         const button = event.target
         const key = button.id
         const layer = overpassLayers[key]
-        if(button.classList.contains('active')) {
+        if(button.classList.contains('active') && !button.classList.contains('inactive')) {
             button.classList.remove('active')
             layer.remove()
         } else {

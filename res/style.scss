@@ -103,6 +103,9 @@ div#map {
     cursor: "pointer";
     &.active {
       background-color: #EE0;
+      &.inactive {
+        background-color: #EE9;
+      }
     }
   }
 }
