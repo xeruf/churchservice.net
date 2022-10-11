@@ -100,9 +100,9 @@
 
     const markers = L.markerClusterGroup({
         polygonOptions: { color: '#EE0', fillOpacity: 0.5 }, // https://leafletjs.com/reference.html#path-options
-        maxClusterRadius: zoom => (zoom < maxZoomCluster) ? 70 : 1, // radius in pixels
+        maxClusterRadius: zoom => (zoom < maxZoomCluster) ? 70 : 20, // radius in pixels
+        //disableClusteringAtZoom: 17,
         //maxClusterRadius: 100,
-        //disableClusteringAtZoom: maxZoomCluster,
         //spiderfyOnMaxZoom: false,
     }).addTo(map)
     function createMarker(church) {
