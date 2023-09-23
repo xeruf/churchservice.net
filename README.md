@@ -1,4 +1,4 @@
-# churchservice.net
+# [churchservice.net](http://churchservice.net)
 
 ## Setup
 
