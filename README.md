@@ -27,6 +27,14 @@ Inspirations:
 https://www.openstreetbrowser.org own instance at https://unternehmer.land/osb/ and https://unternehmer.land/ol
 https://github.com/FacilMap/facilmap
 
+## Todo
+
+- Update geojson automatically from Overpass / local planet file
+- Integrate live overpass with cached geojson
+- Use pretty denomination titles
+- Submenus
+- Tutorial
+
 ## Business Data
 
 Running at https://unternehmer.land
