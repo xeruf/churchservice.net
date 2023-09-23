@@ -1,3 +1,5 @@
+# churchservice.net
+
 ## Setup
 
 Install `npm` and `dart-sass`, on arch:
@@ -31,9 +33,9 @@ Running at https://unternehmer.land
 
 ### OSM
 
-craft: https://wiki.openstreetmap.org/wiki/Map_features#Craft
-office: https://wiki.openstreetmap.org/wiki/Map_features#Office
-shop
+- craft: https://wiki.openstreetmap.org/wiki/Map_features#Craft
+- office: https://wiki.openstreetmap.org/wiki/Map_features#Office
+- shop
 
 ### Handelsregister
 
