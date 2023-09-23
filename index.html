@@ -35,7 +35,13 @@
 </div>
 </body>
 <script type="text/javascript">
-    const churchMap = window.location.href.includes('gemeinde') || window.location.href.includes('church')
+    let params = new URLSearchParams(new URL(window.location.href).search);
+
+    const berlinMap = params.get('berlin') != null
+    const churchMap = window.location.href.includes('gemeinde') ||
+                      window.location.href.includes('church') ||
+                      window.location.href.includes('ogo') ||
+                      berlinMap
 
     const maxZoomCluster = churchMap ? 14 : 16 // 13-16 depending on density
 
@@ -58,13 +64,9 @@
         history.replaceState(null, '', newUrl.toString());
     }
 
-    let newUrl = new URL(window.location.href);
-    let params = new URLSearchParams(newUrl.search);
-
     document.getElementById('search').value = params.get('search')
 
-    // Berlin const defaultPos = { x: 52.5, y: 13.4, z: 13 }
-    const defaultPos = { x: 51, y: 10.5, z: 7 }
+    const defaultPos = berlinMap ? { x: 52.5, y: 13.4, z: 13 } : { x: 51, y: 10.5, z: 7 }
     const map = L.map('map', {
         center: [params.get('x') || defaultPos.x, params.get('y') || defaultPos.y],
         zoom: params.get('z') || defaultPos.z,
@@ -311,11 +313,17 @@
     }
 
     if(churchMap) {
-        document.getElementById('loaders').innerHTML =
-            `<button onclick="loadRegister('churches.geojson')">Globale Kirchen Laden (ca. 700 MB)</button>
+        document.getElementById('loaders').innerHTML = ''
+        /*    `<button onclick="loadRegister('churches.geojson')">Globale Kirchen Laden (ca. 700 MB)</button>
              <button onclick="loadRegister('churches-berlin-overpass.geojson')">Berliner Kirchen Laden (ca. 2 MB)</button>`
-            document.getElementById('church').click()
+        */
         document.title = "Find Your Church"
+        if(berlinMap) {
+            loadRegister('churches-berlin-overpass.geojson')
+            document.title = "Gemeinden in Berlin"
+        } else {
+            document.getElementById('church').click()
+        }
     }
 </script>
 </html>
