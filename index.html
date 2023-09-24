@@ -37,7 +37,7 @@
 <script type="text/javascript">
     let params = new URLSearchParams(new URL(window.location.href).search);
 
-    const berlinMap = params.get('berlin') != null
+    const berlinMap = params.get('berlin') !== null
     const churchMap = window.location.href.includes('gemeinde') ||
                       window.location.href.includes('church') ||
                       window.location.href.includes('ogo') ||
@@ -154,7 +154,7 @@
                 surround(props.craft, "Handwerk: "),
                 surround(props.office, "Büro: "),
                 // Church
-                surround(props.denomination, '<i>', '</i>'),
+                surround(nameDenomination(props.denomination), '<i>', '</i>'),
                 props.service_times && 'Service: ' + props.service_times, // TODO parse properly
                 // Address
                 props['addr:street'] && joinFiltered(' ', props['addr:street'], props['addr:housenumber']),
@@ -183,12 +183,13 @@
                 button.remove()
             })
     }
-    function loadRegister(register) {
+    async function loadRegister(register) {
         if(event) {
             console.log('Event:', event)
             const button = event.target
             button.disabled = true
         }
+        denominations = denominations || await fetch('osm-religious-denominations.json').then(response => response.json())
         const markers = fetch(register)
             .then(response => response.json())
             .then(json => (json.features || json).map(createMarker).filter(marker => marker !== null))
@@ -197,6 +198,16 @@
                 filter(document.getElementById('search').value)
                 if(event) button.remove()
             })
+    }
+
+    let denominations
+    function nameDenomination(denom) {
+        if(!denom) return denom
+        const classification = Object.keys(denominations.Christian)
+              .find(classification => Object.keys(denominations.Christian[classification]).includes(denom))
+        const exact = classification && denominations.Christian[classification][denom]
+        // TODO uppercase word starts
+        return classification ? (exact != classification ? `${classification} > ${exact}` : exact) : denom.replaceAll('_', ' ')
     }
 
     let visible = [];
@@ -319,8 +330,8 @@
         */
         document.title = "Find Your Church"
         if(berlinMap) {
-            loadRegister('churches-berlin-overpass.geojson')
             document.title = "Gemeinden in Berlin"
+            loadRegister('churches-berlin-overpass.geojson')
         } else {
             document.getElementById('church').click()
         }
