@@ -21,7 +21,7 @@
     <input class="fontIcon" id="search" type="text" autocomplete="off" oninput="filter(this.value)" placeholder="Filtern..."/>
     <div id="loaders">
         <button onclick="loadAll()">Globale Betriebe Laden (ca. 1 GB)</button>
-        <button onclick="loadRegister('register.geojson')">Register Laden (ca. 300 MB)</button>
+        <button onclick="loadRegister('register.geojson')">Deutsche Register Laden (ca. 300 MB)</button>
     </div>
     <!-- <a href="#">filter by service=today -> chain filters </a> -->
 </div>
@@ -79,7 +79,7 @@
         setView: true,
         maxZoom: maxZoomCluster,
         maximumAge: 600_000, // 10 minutes
-        //timeout: 2000,
+        // timeout: 2000,
         // watch: true, TODO simulate movement and test
         // console.log("Map Moved") map.stopLocate()
     });
@@ -174,7 +174,7 @@
     function loadAll() {
         const button = event.target
         button.disabled = true
-        const markers = fetch('planet-220926-craft.geojson')
+        const markers = fetch('data/planet-220926-craft.geojson')
             .then(response => response.json())
             .then(json => json.features.map(createMarker).filter(marker => marker !== null))
             .then(markers => {
@@ -189,8 +189,8 @@
             const button = event.target
             button.disabled = true
         }
-        denominations = denominations || await fetch('osm-religious-denominations.json').then(response => response.json())
-        const markers = fetch(register)
+        denominations = denominations || await fetch('data/osm-religious-denominations.json').then(response => response.json())
+        const markers = fetch('data/' + register)
             .then(response => response.json())
             .then(json => (json.features || json).map(createMarker).filter(marker => marker !== null))
             .then(markers => {

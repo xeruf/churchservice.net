@@ -12,7 +12,7 @@ node_modules:
 setup: node_modules
 
 deploy: node_modules
-	rsync --recursive --info=progress2,remove,symsafe,flist,del --human-readable index.html churches-berlin-overpass.geojson node_modules res iridion:/home/janek/web/churchservice.net/public_html/
+	rsync --recursive --info=progress2,remove,symsafe,flist,del --human-readable index.html node_modules res data iridion:/home/janek/web/churchservice.net/public_html/
 
 local: node_modules
 	cp -rf index.html *.geojson node_modules/ res/ ..

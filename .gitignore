@@ -2,5 +2,5 @@
 *-cache/
 *.css
 *.css.map
-*.geojson
+/*.geojson
 node_modules/
