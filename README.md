@@ -1,12 +1,14 @@
-# [churchservice.net](http://churchservice.net)
+# [churchservice.net](https://churchservice.net)
 
 This site enables you to browse christian churches and filter them by denomination
 based on OpenStreetMap data.
 It is functional but not very smooth.
 
-Note that filtering only works on preloaded data,
+Note that filtering only works on the names and denominations within preloaded data,
 not the dynamic queries that can be enabled at the bottom,
 and preloading can require a significant amount of time, memory, and traffic.
+
+Try https://churchservice.net?berlin if you are not on a metered connection.
 
 ## Setup
 

@@ -20,7 +20,7 @@
 <div class="overlay" id="filters">
     <input class="fontIcon" id="search" type="text" autocomplete="off" oninput="filter(this.value)" placeholder="Filtern..."/>
     <div id="loaders">
-        <button onclick="loadAll()">Globale Betriebe Laden (ca. 1 GB)</button>
+        <button onclick="loadAll()">Globale Betriebe Laden (bis zu 1 GB)</button>
         <button onclick="loadRegister('register.geojson')">Deutsche Register Laden (ca. 300 MB)</button>
     </div>
     <!-- <a href="#">filter by service=today -> chain filters </a> -->
@@ -75,7 +75,8 @@
     L.tileLayer('https://{s}.tile.openstreetmap.de/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | <a onclick="editOSM()" href="#">Contribute</a>'
     }).addTo(map)
-    params.has('x') || params.has('y') || map.locate({
+    // TODO keep berlin visible
+    berlinMap || params.has('x') || params.has('y') || map.locate({
         setView: true,
         maxZoom: maxZoomCluster,
         maximumAge: 600_000, // 10 minutes
@@ -134,7 +135,7 @@
             title: props.name,
             riseOnHover: true,
             icon: markerIcon,
-        }).on('click', () => console.log("Selected", church))
+        }).on('click', () => console.log("Selected:", church))
         marker.properties = props
         marker.properties.searchName = props.name.toString().toLowerCase()
         function nonBlank(string) {
@@ -202,7 +203,7 @@
 
     let denominations
     function nameDenomination(denom) {
-        if(!denom) return denom
+        if(!denom || !denominations) return denom
         const classification = Object.keys(denominations.Christian)
               .find(classification => Object.keys(denominations.Christian[classification]).includes(denom))
         const exact = classification && denominations.Christian[classification][denom]
